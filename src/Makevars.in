@@ -1,0 +1,9 @@
+## Makevars.in for HiSpaR package compilation (configured by autoconf)
+
+# Compiler standard
+CXX_STD = CXX17
+
+# Flags set by configure script
+PKG_CPPFLAGS = @PKG_CPPFLAGS@
+PKG_CXXFLAGS = @PKG_CXXFLAGS@
+PKG_LIBS = @PKG_LIBS@

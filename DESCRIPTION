@@ -1,0 +1,39 @@
+Package: HiSpaR
+Type: Package
+Title: Hierarchical Inference of Spatial Positions from Hi-C Data
+Version: 0.99.0
+Date: 2026-01-15
+Authors@R: c(
+    person("Yingcheng", "Luo", email = "lyc22@mails.tsinghua.edu.cn", role = c("aut", "cre"))
+    )
+Description: Provides R bindings for HiSpa, a hierarchical Bayesian model 
+    for inferring three-dimensional chromatin structures from Hi-C contact matrices 
+    using Markov Chain Monte Carlo (MCMC) sampling. The package implements a 
+    cluster-based hierarchical approach that efficiently handles large-scale Hi-C 
+    datasets. It uses Rcpp and RcppArmadillo for efficient C++ integration with 
+    the original HiSpa C++ implementation, enabling fast computation of chromatin 
+    structure inference through parallel MCMC sampling.
+License: MIT + file LICENSE
+Depends: R (>= 4.3.0)
+Imports: 
+    Rcpp (>= 1.0.0),
+    utils,
+    BiocGenerics
+biocViews: Software, Epigenetics, HiC, StructuralPrediction, Bayesian, Spatial
+LinkingTo: Rcpp, RcppArmadillo
+SystemRequirements: 
+    C++17,
+    GNU make,
+    Armadillo (>= 9.0),
+    OpenMP
+URL: https://github.com/masterStormtrooper/HiSpa
+BugReports: https://github.com/masterStormtrooper/HiSpa/issues
+Encoding: UTF-8
+LazyData: false
+RoxygenNote: 7.3.2
+Suggests: 
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    rgl
+VignetteBuilder: knitr

@@ -1,0 +1,7 @@
+Changes in version 0.99.0 (2026-01-16)
++ Initial Bioconductor submission
++ Implements hierarchical Bayesian inference of 3D chromatin structures
++ Supports MCMC sampling with cluster-based hierarchical approach
++ Includes example Hi-C contact matrix dataset (su1_contact_mat)
++ Provides efficient C++ implementation via Rcpp and RcppArmadillo
++ OpenMP support for parallel computation

@@ -1,0 +1,13 @@
+## Makevars.win for HiSpaR package compilation on Windows
+
+# Compiler standard
+CXX_STD = CXX17
+
+# Include directories
+PKG_CPPFLAGS = -I../inst/include
+
+# Compiler flags - use R's OpenMP detection
+PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
+
+# Linker flags
+PKG_LIBS = $(SHLIB_OPENMP_CXXLIBS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)

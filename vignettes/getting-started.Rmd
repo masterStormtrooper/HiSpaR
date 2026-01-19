@@ -1,0 +1,60 @@
+---
+title: "Getting Started with HiSpaR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with HiSpaR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+HiSpaR is an R package for inferring 3D chromatin structures from Hi-C contact matrices using hierarchical Bayesian modeling and MCMC sampling.
+
+## Installation
+
+```{r, eval=FALSE}
+# Install from Bioconductor (after acceptance)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("HiSpaR")
+```
+
+## Basic Usage
+
+### Loading the Package and Data
+
+```{r setup}
+library(HiSpaR)
+
+# Load example data
+data(su1_contact_mat)
+dim(su1_contact_mat)
+```
+
+### Quick Example
+
+```{r example, eval=FALSE}
+# Run analysis on example data (small parameters for vignette)
+# known issue: the function will result in SIGBART but the results are saved correctly
+result <- hispa_analyze(
+  contact_matrix = su1_contact_mat,
+  output_dir = tempdir(),
+  mcmc_iterations = 100,
+  mcmc_burn_in = 10,
+  verbose = FALSE
+)
+```
+
+## Session Information
+
+```{r sessionInfo}
+sessionInfo()
+```

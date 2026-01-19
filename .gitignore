@@ -1,0 +1,18 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+src/*.o
+src/*.so
+src/*.dll
+*.tar.gz
+
+# R package build artifacts
+*.Rcheck/
+*.tar.gz
+.Rproj.user/
+src/*.o
+src/*.so
+src/*.dll
+src/Makevars
+*.BiocCheck/

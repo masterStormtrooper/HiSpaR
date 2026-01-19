@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# cleanup script for HiSpaR package
+# Removes files generated during configuration
+
+rm -f src/Makevars
+rm -f config.log config.status
+
+echo "Cleanup complete"
+exit 0

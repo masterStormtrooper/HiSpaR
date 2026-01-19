@@ -1,0 +1,126 @@
+#!/bin/sh
+
+# configure script for HiSpaR package
+# Detects platform and sets appropriate compiler flags
+
+# Get R configuration
+: ${R_HOME=`R RHOME`}
+if test -z "${R_HOME}"; then
+  echo "could not determine R_HOME"
+  exit 1
+fi
+CC=`"${R_HOME}/bin/R" CMD config CC`
+CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
+CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
+CXX=`"${R_HOME}/bin/R" CMD config CXX`
+CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXXFLAGS`
+
+# Initialize flags
+PKG_CPPFLAGS="-I../inst/include"
+PKG_CXXFLAGS="\$(SHLIB_OPENMP_CXXFLAGS)"
+PKG_LIBS=""
+
+# Detect platform
+UNAME=`uname`
+
+echo "Configuring HiSpaR for platform: ${UNAME}"
+
+# Platform-specific configuration
+case "${UNAME}" in
+  Darwin)
+    echo "  Detected macOS"
+    
+    # Check for Homebrew
+    if command -v brew >/dev/null 2>&1; then
+      HOMEBREW_PREFIX=`brew --prefix 2>/dev/null`
+      echo "  Homebrew prefix: ${HOMEBREW_PREFIX}"
+      
+      # Check for libomp
+      if [ -d "${HOMEBREW_PREFIX}/opt/libomp" ]; then
+        echo "  Found libomp"
+        PKG_CPPFLAGS="${PKG_CPPFLAGS} -I${HOMEBREW_PREFIX}/opt/libomp/include"
+        PKG_CXXFLAGS="${PKG_CXXFLAGS} -Xclang -fopenmp"
+        PKG_LIBS="\$(SHLIB_OPENMP_CXXLIBS) -L${HOMEBREW_PREFIX}/opt/libomp/lib -lomp"
+      else
+        echo "  WARNING: libomp not found. Install with: brew install libomp"
+      fi
+      
+      # Check for Armadillo
+      if [ -d "${HOMEBREW_PREFIX}/opt/armadillo" ]; then
+        echo "  Found Armadillo"
+        PKG_CPPFLAGS="${PKG_CPPFLAGS} -I${HOMEBREW_PREFIX}/opt/armadillo/include"
+        PKG_LIBS="${PKG_LIBS} -L${HOMEBREW_PREFIX}/opt/armadillo/lib -larmadillo"
+      else
+        echo "  WARNING: Armadillo not found. Install with: brew install armadillo"
+      fi
+      
+      # Use Accelerate framework for BLAS/LAPACK
+      PKG_LIBS="${PKG_LIBS} -framework Accelerate"
+    else
+      echo "  WARNING: Homebrew not found. Package may not compile correctly."
+      echo "  Install Homebrew from https://brew.sh"
+    fi
+    ;;
+    
+  Linux)
+    echo "  Detected Linux"
+    
+    # Check for OpenMP support
+    PKG_CXXFLAGS="${PKG_CXXFLAGS} -fopenmp"
+    PKG_LIBS="\$(SHLIB_OPENMP_CXXLIBS)"
+    
+    # Check for Armadillo using pkg-config
+    if pkg-config --exists armadillo 2>/dev/null; then
+      echo "  Found Armadillo via pkg-config"
+      ARMA_CFLAGS=`pkg-config --cflags armadillo`
+      ARMA_LIBS=`pkg-config --libs armadillo`
+      PKG_CPPFLAGS="${PKG_CPPFLAGS} ${ARMA_CFLAGS}"
+      PKG_LIBS="${PKG_LIBS} ${ARMA_LIBS}"
+    else
+      echo "  Armadillo pkg-config not found, using defaults"
+      PKG_LIBS="${PKG_LIBS} -larmadillo"
+    fi
+    
+    # Add standard math libraries
+    PKG_LIBS="${PKG_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
+    ;;
+    
+  *)
+    echo "  Unknown platform: ${UNAME}"
+    echo "  Using default configuration"
+    PKG_LIBS="\$(SHLIB_OPENMP_CXXLIBS) \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
+    ;;
+esac
+
+# Verify OpenMP support with a test compilation
+echo "Checking for OpenMP support..."
+cat > test-openmp.cpp <<EOF
+#include <omp.h>
+#include <iostream>
+int main() {
+  #pragma omp parallel
+  {
+    std::cout << "OpenMP thread " << omp_get_thread_num() << std::endl;
+  }
+  return 0;
+}
+EOF
+
+if ${CXX} ${CXXFLAGS} ${PKG_CXXFLAGS} test-openmp.cpp -o test-openmp ${PKG_LIBS} 2>/dev/null; then
+  echo "  OpenMP support: YES"
+  rm -f test-openmp test-openmp.cpp
+else
+  echo "  OpenMP support: NO"
+  echo "  WARNING: OpenMP is required for HiSpaR. Package may not function correctly."
+  rm -f test-openmp test-openmp.cpp
+fi
+
+# Write configuration to Makevars
+echo "Writing src/Makevars"
+sed -e "s|@PKG_CPPFLAGS@|${PKG_CPPFLAGS}|" \
+    -e "s|@PKG_CXXFLAGS@|${PKG_CXXFLAGS}|" \
+    -e "s|@PKG_LIBS@|${PKG_LIBS}|" \
+    src/Makevars.in > src/Makevars
+
+echo "Configuration complete"
+exit 0
