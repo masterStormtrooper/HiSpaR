@@ -14,7 +14,7 @@ Description: Provides R bindings for HiSpa, a hierarchical Bayesian model
     the original HiSpa C++ implementation, enabling fast computation of chromatin 
     structure inference through parallel MCMC sampling.
 License: MIT + file LICENSE
-Depends: R (>= 4.3.0)
+Depends: R (>= 4.5.0)
 Imports: 
     Rcpp (>= 1.0.0),
     utils,
