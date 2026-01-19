@@ -8,8 +8,6 @@ HiSpaR is an R package that provides R bindings for the HiSpa C++ library, enabl
 
 - 🧬 **Hierarchical Bayesian modeling** of 3D chromatin structure
 - 🎯 **MCMC sampling** with adaptive proposals for efficient inference
-- 📊 **Cluster-based analysis** for large-scale Hi-C data
-- 🔄 **Prior information integration** from reference datasets
 - ⚡ **High-performance C++** backend via Rcpp and RcppArmadillo
 - 🔧 **OpenMP parallelization** for multi-core processing
 
@@ -99,40 +97,6 @@ Usually works out of the box if OpenMP is installed with GCC.
 1. Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
 2. Install Armadillo (more complex on Windows, may require pre-compiled libraries)
 
-## Quick Start
-
-```r
-library(HiSpaR)
-
-# Prepare your Hi-C contact matrix file (space/tab delimited text file)
-# The file should contain an n x n matrix of contact counts
-
-# Run HiSpa analysis with file path
-# All results are automatically saved to the output directory
-hispa_analyze(
-  input_file = "contact_matrix.txt",
-  output_dir = "output",
-  mcmc_iterations = 6000,
-  mcmc_burn_in = 1000,
-  num_clusters = 0,  # Auto-detect
-  verbose = TRUE
-)
-
-# Results are saved in output directory:
-# - output/final_positions.txt (final 3D structure)
-# - output/initial_positions.txt (starting positions)
-# - output/log_likelihood_trace.txt (MCMC convergence)
-# - output/block_timings.txt (performance metrics)
-# - output/mcmc_log.txt (detailed log)
-
-# Read and analyze results
-final_positions <- read.table("output/final_positions.txt")
-ll_trace <- scan("output/log_likelihood_trace.txt")
-
-# Plot convergence
-plot(ll_trace, type = "l",
-     xlab = "Iteration", ylab = "Log-Likelihood")
-```
 
 ## Main Functions
 
@@ -163,7 +127,7 @@ Run complete HiSpa MCMC analysis on a Hi-C contact matrix following the exact wo
 - `mcmc_log.txt` - Detailed analysis log
 
 **Workflow:**
-1. Load contact matrix from input file
+1. Load contact matrix from input file / matrix
 2. Assign loci to clusters (k-means)
 3. Build cluster relationships
 4. Initialize structure (random or cluster-based)
@@ -171,63 +135,29 @@ Run complete HiSpa MCMC analysis on a Hi-C contact matrix following the exact wo
 6. Run main MCMC algorithm
 7. Save all results to output directory
 
-## Examples
-
-See the `examples/` directory for complete workflows:
-- **basic_analysis.R**: Simple Hi-C analysis with random initialization
-- **with_priors.R**: Using cluster-based initialization
-- **convolution_example.R**: Comparing different parameter settings
-
 ### Example: Basic Analysis
 
 ```r
 library(HiSpaR)
 
-# Generate synthetic data and save to file
-n <- 50
-contact_mat <- matrix(rpois(n*n, lambda = 10), n, n)
-contact_mat <- (contact_mat + t(contact_mat)) / 2
-write.table(contact_mat, "contact_matrix.txt", 
-            row.names = FALSE, col.names = FALSE)
+# loads a hic matrix, from Su et al., 2020
+data(su1_contact_mat)
 
 # Run analysis - results saved automatically
 hispa_analyze(
-  input_file = "contact_matrix.txt",
-  output_dir = "example_output",
+  input_file = "su1_contact_mat",
+  output_dir = "su1",
   mcmc_iterations = 4000,
-  mcmc_burn_in = 1000
+  mcmc_burn_in = 1000,
+  use_cluster_init = TRUE # strongly recommended
 )
 
 # Read results from output directory
-final_positions <- as.matrix(read.table("example_output/final_positions.txt"))
-ll_trace <- scan("example_output/log_likelihood_trace.txt")
+final_pos <- as.matrix(read.table("su1/final_positions.txt"))
 
-# Plot convergence
-plot(ll_trace, type = "l",
-     xlab = "Iteration", ylab = "Log-Likelihood")
-
-# 3D visualization (requires rgl)
-if (require("rgl")) {
-  plot3d(final_positions, col = rainbow(n), size = 5)
-}
-
-```
-
-### Example: Cluster Initialization
-
-```r
-# Use cluster-based initialization for better convergence
-hispa_analyze(
-  input_file = "contact_matrix.txt",
-  output_dir = "output",
-  mcmc_iterations = 6000,
-  mcmc_burn_in = 1000,
-  use_cluster_init = TRUE,
-  cluster_init_iterations = 1000,
-  num_clusters = 5
-)
-
-# Results are saved in output/
+# 3D visualization (requires plotly)
+library(plotly)
+plot_ly(x = final_pos[,1], y = final_pos[,2], z = final_pos[,3], type = 'scatter3d', mode = 'markers+lines')
 ```
 
 ## Documentation
@@ -241,9 +171,8 @@ After installation, access help documentation:
 
 1. **Start with fewer iterations** for testing (e.g., 1000-2000)
 2. **Use clustering** for large matrices (>200 loci)
-3. **Enable convolution** for noisy data: `use_convoluted_sampling = TRUE`
-4. **Parallel processing**: OpenMP automatically uses multiple cores
-5. **Save samples sparingly**: Only when needed for diagnostics
+3. **Parallel processing**: OpenMP automatically uses multiple cores
+4. **Save samples sparingly**: Only when needed for diagnostics
 
 ## Troubleshooting
 
@@ -267,13 +196,7 @@ CPPFLAGS = -I/usr/local/opt/libomp/include
 2. Update R packages: `update.packages()`
 3. Reinstall Rcpp: `install.packages("Rcpp", type = "source")`
 
-## Citation
 
-If you use HiSpaR in your research, please cite:
-
-```
-[Citation information to be added]
-```
 
 ## License
 
@@ -286,8 +209,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Contact
 
 - **Issues**: https://github.com/masterStormtrooper/HiSpa/issues
-- **Email**: [your contact]
+- **Email**: lyc22@mails.tsinghua.edu.cn
 
 ## Acknowledgments
 
-HiSpaR wraps the HiSpa C++ library developed by [authors].
+HiSpaR wraps the HiSpa C++ library developed by Yingcheng Luo.
