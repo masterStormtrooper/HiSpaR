@@ -12,13 +12,13 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // hispa_analyze_cpp
-bool hispa_analyze_cpp(std::string input_file, std::string output_dir, int mcmc_iterations, int num_clusters, int mcmc_burn_in, double mcmc_initial_sd, double mcmc_sd_floor, double mcmc_sd_ceil, bool use_cluster_init, int cluster_init_iterations, double cluster_initial_sd, bool save_samples, int sample_interval, bool verbose);
-RcppExport SEXP _HiSpaR_hispa_analyze_cpp(SEXP input_fileSEXP, SEXP output_dirSEXP, SEXP mcmc_iterationsSEXP, SEXP num_clustersSEXP, SEXP mcmc_burn_inSEXP, SEXP mcmc_initial_sdSEXP, SEXP mcmc_sd_floorSEXP, SEXP mcmc_sd_ceilSEXP, SEXP use_cluster_initSEXP, SEXP cluster_init_iterationsSEXP, SEXP cluster_initial_sdSEXP, SEXP save_samplesSEXP, SEXP sample_intervalSEXP, SEXP verboseSEXP) {
+Rcpp::List hispa_analyze_cpp(arma::mat contact_matrix, const std::string& output_dir, int mcmc_iterations, int num_clusters, int mcmc_burn_in, double mcmc_initial_sd, double mcmc_sd_floor, double mcmc_sd_ceil, bool use_cluster_init, int cluster_init_iterations, double cluster_initial_sd, bool save_samples, int sample_interval, bool verbose);
+RcppExport SEXP _HiSpaR_hispa_analyze_cpp(SEXP contact_matrixSEXP, SEXP output_dirSEXP, SEXP mcmc_iterationsSEXP, SEXP num_clustersSEXP, SEXP mcmc_burn_inSEXP, SEXP mcmc_initial_sdSEXP, SEXP mcmc_sd_floorSEXP, SEXP mcmc_sd_ceilSEXP, SEXP use_cluster_initSEXP, SEXP cluster_init_iterationsSEXP, SEXP cluster_initial_sdSEXP, SEXP save_samplesSEXP, SEXP sample_intervalSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type input_file(input_fileSEXP);
-    Rcpp::traits::input_parameter< std::string >::type output_dir(output_dirSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type contact_matrix(contact_matrixSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type output_dir(output_dirSEXP);
     Rcpp::traits::input_parameter< int >::type mcmc_iterations(mcmc_iterationsSEXP);
     Rcpp::traits::input_parameter< int >::type num_clusters(num_clustersSEXP);
     Rcpp::traits::input_parameter< int >::type mcmc_burn_in(mcmc_burn_inSEXP);
@@ -31,7 +31,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type save_samples(save_samplesSEXP);
     Rcpp::traits::input_parameter< int >::type sample_interval(sample_intervalSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(hispa_analyze_cpp(input_file, output_dir, mcmc_iterations, num_clusters, mcmc_burn_in, mcmc_initial_sd, mcmc_sd_floor, mcmc_sd_ceil, use_cluster_init, cluster_init_iterations, cluster_initial_sd, save_samples, sample_interval, verbose));
+    rcpp_result_gen = Rcpp::wrap(hispa_analyze_cpp(contact_matrix, output_dir, mcmc_iterations, num_clusters, mcmc_burn_in, mcmc_initial_sd, mcmc_sd_floor, mcmc_sd_ceil, use_cluster_init, cluster_init_iterations, cluster_initial_sd, save_samples, sample_interval, verbose));
     return rcpp_result_gen;
 END_RCPP
 }

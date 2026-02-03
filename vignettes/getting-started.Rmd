@@ -1,6 +1,9 @@
 ---
 title: "Getting Started with HiSpaR"
-output: rmarkdown::html_vignette
+output: 
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{Getting Started with HiSpaR}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,42 +19,168 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-HiSpaR is an R package for inferring 3D chromatin structures from Hi-C contact matrices using hierarchical Bayesian modeling and MCMC sampling.
+High-throughput chromosome conformation capture (Hi-C) has become the gold standard for studying 3D genome organization. While Hi-C generates rich 2D contact maps, a major goal of many genomic studies is to reconstruct the underlying 3D chromatin structures from this data.
+
+HiSpaR is an R package designed to infer these 3D structures using hierarchical Bayesian modeling and Markov Chain Monte Carlo (MCMC) sampling. Unlike traditional constraint-based methods, HiSpaR utilizes a hierarchical framework to efficiently handle large-scale datasets while providing robust uncertainty quantification for the inferred coordinates.
+
+HiSpaR integrates seamlessly with the HiCExperiment ecosystem. Users can easily import Hi-C data from standard formats (such as .mcool and .hic) into HiCExperiment objects and pass them directly to HiSpaR, streamlining the workflow from raw data to 3D visualization.
 
 ## Installation
 
 ```{r, eval=FALSE}
-# Install from Bioconductor (after acceptance)
+# Install HiSpaR from Bioconductor
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("HiSpaR")
+
+# HiSpaR depends on several packages for Hi-C data handling
+# These are automatically installed with HiSpaR:
+# - HiCExperiment: For representing Hi-C data
+# - Matrix: For sparse matrix handling
+
+# Additionally, install example data package and HiContacts for data manipulation
+BiocManager::install("HiContactsData")
+BiocManager::install("HiContacts")
+# Optional: Install visualization and analysis packages
+install.packages("plotly")  # For interactive 3D visualization
 ```
+
+### Dependencies
+
+HiSpaR requires the following Bioconductor and CRAN packages:
+
+- **Core**: HiCExperiment, Matrix
+- **Suggested**: plotly (for interactive 3D visualization), callr (for safe subprocess execution), HiContacts (for data manipulation), HiContactsData (for example datasets)
 
 ## Basic Usage
 
-### Loading the Package and Data
+### Loading Required Packages
 
 ```{r setup}
 library(HiSpaR)
+library(HiContacts)
+library(HiContactsData)
+library(plotly)
 
-# Load example data
+# Load example data from HiCExperiment
+cool_file <- CoolFile(HiContactsData::HiContactsData('yeast_wt', format = 'cool'))
+hic <- import(cool_file, focus = "II:10000-100000")
+# visualize the contact matrix
+plotMatrix(hic)
+# Load example contact matrix (from HiSpaR's built-in data)
 data(su1_contact_mat)
-dim(su1_contact_mat)
+cat("Loaded contact matrix dimensions:", dim(su1_contact_mat), "\n")
 ```
+
+### Input Data Formats
+
+HiSpaR accepts two types of input:
+
+1. **HiCExperiment objects**: Data from `HiCExperiment::import()` (recommended for Bioconductor integration)
+2. **Contact matrices**: Numeric matrices where rows and columns represent genomic loci and entries represent contact counts
+
+Both formats are automatically handled by `hispa_analyze()`, which extracts and processes the contact matrix internally.
 
 ### Quick Example
 
-```{r example, eval=FALSE}
-# Run analysis on example data (small parameters for vignette)
-# known issue: the function will result in SIGBART but the results are saved correctly
-result <- hispa_analyze(
-  contact_matrix = su1_contact_mat,
+HiSpaR provides the main function `hispa_analyze()` to perform the complete 3D structure inference pipeline:
+
+```{r example, eval=TRUE}
+# Run analysis on the example HiCExperiment object
+result_yeast <- hispa_analyze(
+  hic_experiment = hic,
   output_dir = tempdir(),
-  mcmc_iterations = 100,
+  mcmc_iterations = 1000,
+  use_cluster_init = TRUE,
   mcmc_burn_in = 10,
-  verbose = FALSE
+  filter_quantile = 0.1,  # Filter out loci in the bottom 10% of contact counts
+  verbose = TRUE
 )
+# Check the structure of results
+cat("Result structure:\n")
+str(result_yeast)
+cat("Final positions (first 5 loci):\n")
+print(head(result_yeast$positions, 5))
+cat("Estimated parameters: beta0 =", result_yeast$beta0, ", beta1 =", result_yeast$beta1, "\n")
+
+# Run analysis on the example contact matrix
+result_su <- hispa_analyze(
+  hic_experiment = su1_contact_mat,
+  output_dir = tempdir(),
+  mcmc_iterations = 2000,
+  use_cluster_init = TRUE,
+  mcmc_burn_in = 10,
+  filter_quantile = 0.1,  # Filter out loci in the bottom 10% of contact counts
+  verbose = TRUE
+)
+
+# Check the structure of results
+cat("Result structure:\n")
+str(result_su)
+cat("Final positions (first 5 loci):\n")
+print(head(result_su$positions, 5))
+cat("Estimated parameters: beta0 =", result_su$beta0, ", beta1 =", result_su$beta1, "\n")
 ```
+
+### Key Parameters
+
+- `mcmc_iterations`: Total number of MCMC iterations (default: 6000)
+- `use_cluster_init`: Use hierarchical clustering for initialization (recommended for large datasets)
+- `filter_quantile`: Remove loci below this quantile of contact counts (default: -1, no filtering). Use 0.1 to remove bottom 10%
+- `mcmc_burn_in`: Number of burn-in iterations to discard (default: 0)
+
+### Visualization
+
+We recommend using the `plotly` package for interactive 3D visualization of the inferred chromatin structures:
+
+```{r visualization, eval=TRUE}
+coords_yeast <- result_yeast$positions
+# Create interactive 3D scatter plot
+plot_ly(
+  x = coords_yeast[,1],
+  y = coords_yeast[,2],
+  z = coords_yeast[,3],
+  type = 'scatter3d',
+  mode = 'markers+lines',
+  marker = list(size = 5, color = ~seq_len(nrow(coords_yeast)), showscale = TRUE),
+) %>%
+  layout(
+    title = "Inferred 3D Chromatin Structure",
+    scene = list(
+      xaxis = list(title = "X"),
+      yaxis = list(title = "Y"),
+      zaxis = list(title = "Z")
+    )
+  )
+# Extract coordinates from results
+coords_su <- result_su$positions
+
+# Create interactive 3D scatter plot
+plot_ly(
+  x = coords_su[,1],
+  y = coords_su[,2],
+  z = coords_su[,3],
+  type = 'scatter3d',
+  mode = 'markers+lines',
+  marker = list(size = 5, color = ~seq_len(nrow(coords_su)), showscale = TRUE),
+) %>%
+  layout(
+    title = "Inferred 3D Chromatin Structure",
+    scene = list(
+      xaxis = list(title = "X"),
+      yaxis = list(title = "Y"),
+      zaxis = list(title = "Z")
+    )
+  )
+```
+
+### Output Files
+
+All results are automatically saved to the specified output directory:
+
+- `final_positions.txt`: Final inferred 3D coordinates (n × 3 matrix)
+- `initial_positions.txt`: Initial positions before MCMC
+
 
 ## Session Information
 

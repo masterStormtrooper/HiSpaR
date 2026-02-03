@@ -5,7 +5,7 @@
 \title{Run HiSpa MCMC Analysis}
 \usage{
 hispa_analyze(
-  contact_matrix,
+  hic_experiment,
   output_dir,
   mcmc_iterations = 6000L,
   num_clusters = 0L,
@@ -18,12 +18,16 @@ hispa_analyze(
   cluster_initial_sd = 0.1,
   save_samples = FALSE,
   sample_interval = 50L,
-  verbose = TRUE
+  verbose = TRUE,
+  filter_quantile = -1,
+  safe_mode = TRUE
 )
 }
 \arguments{
-\item{contact_matrix}{Numeric matrix, Hi-C contact frequencies (symmetric, n x n).
-Alternatively, a character string path to a contact matrix file.}
+\item{hic_experiment}{A Bioconductor `HiCExperiment` object or a numeric matrix
+containing Hi-C contact data. If a `HiCExperiment` object, the function extracts 
+the contact matrix using `gi2cm()` from the interactions and converts it to a 
+numeric matrix for analysis. If a matrix, it is used directly.}
 
 \item{output_dir}{Character string specifying the output directory path.}
 
@@ -54,10 +58,26 @@ initialization MCMC (default: 0.1).}
 \item{sample_interval}{Integer, save samples every n iterations (default: 50).}
 
 \item{verbose}{Logical, enable verbose output (default: TRUE).}
+
+\item{filter_quantile}{Numeric, quantile threshold for filtering loci by contact counts 
+(default: -1, no filtering). If >= 0, loci with row sums below this quantile are removed. 
+For example, 0.1 removes loci in the bottom 10\% of contact counts.}
+
+\item{safe_mode}{Logical, whether to run analysis in a safe subprocess using callr 
+(default: TRUE). If TRUE and callr is available, analysis runs in an isolated subprocess 
+to prevent R crashes from affecting the parent session. Set to FALSE to run inline.}
 }
 \value{
-Invisibly returns the output directory path. All analysis results
-  are saved as text files in the output directory (see Details).
+A list containing:
+  \itemize{
+    \item \strong{positions} - A numeric matrix of dimensions n x 3 containing the 
+      final inferred 3D coordinates of loci. Rows correspond to loci, columns are (x, y, z).
+    \item \strong{beta0} - The final intercept parameter of the log-distance relationship.
+    \item \strong{beta1} - The final slope parameter of the log-distance relationship.
+  }
+  If filtering was applied, the positions matrix has an attribute `filtered_locus_indices` 
+  containing the original indices of the retained loci (before filtering).
+  Additionally, all analysis results are saved as text files in the output directory.
 }
 \description{
 Performs hierarchical Bayesian inference of 3D chromatin structure from
@@ -67,6 +87,7 @@ workflow from the HiSpa C++ implementation.
 \details{
 This function implements the complete HiSpa workflow:
 \enumerate{
+  \item Filter loci by contact count (optional)
   \item Load contact matrix from file
   \item Assign loci to clusters (k-means)
   \item Build cluster relationships
@@ -76,18 +97,20 @@ This function implements the complete HiSpa workflow:
   \item Save results to output directory
 }
 
+\bold{Locus Filtering:} By default, no filtering is applied (filter_quantile = -1). 
+If filter_quantile >= 0, loci with contact counts below the specified quantile 
+are removed before analysis. For example, filter_quantile = 0.1 removes loci in 
+the bottom 10\% of contact counts. This improves computational efficiency and 
+focuses analysis on loci with sufficient data.
+
 All results are automatically saved to the output directory:
 \itemize{
   \item \strong{final_positions.txt} - Final inferred 3D coordinates (n x 3 matrix)
   \item \strong{initial_positions.txt} - Initial positions before MCMC (n x 3 matrix)
-  \item \strong{log_likelihood_trace.txt} - MCMC log-likelihood values (convergence diagnostic)
-  \item \strong{block_timings.txt} - Computation time for each MCMC block
-  \item \strong{mcmc_log.txt} - Detailed analysis log with parameter values and settings
 }
 
 Read results using standard R functions:
 \code{final_pos <- read.table("output_dir/final_positions.txt")}
-\code{ll_trace <- scan("output_dir/log_likelihood_trace.txt")}
 }
 \examples{
 # Load example contact matrix
@@ -98,8 +121,8 @@ dim(su1_contact_mat)
 
 \donttest{
 # Example 1: Run analysis with matrix input
-hispa_analyze(
-  contact_matrix = su1_contact_mat,
+su_res <- hispa_analyze(
+  hic_experiment = su1_contact_mat,
   output_dir = tempdir(),
   mcmc_iterations = 100,
   mcmc_burn_in = 10,
@@ -107,9 +130,8 @@ hispa_analyze(
   verbose = TRUE
 )
 
-# Read results from output directory
-final_pos <- as.matrix(read.table(file.path(tempdir(), "final_positions.txt")))
-head(final_pos)
+# check results
+dim(su_res$positions)  # Should be n x 3
 }
 
 }

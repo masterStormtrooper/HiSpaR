@@ -9,7 +9,7 @@
 #' 
 #' @keywords internal
 #' @noRd
-.hispa_analyze_cpp <- function(input_file, output_dir, mcmc_iterations = 6000L, num_clusters = 0L, mcmc_burn_in = 0L, mcmc_initial_sd = 0.1, mcmc_sd_floor = 0.0001, mcmc_sd_ceil = 0.3, use_cluster_init = FALSE, cluster_init_iterations = 1000L, cluster_initial_sd = 0.1, save_samples = FALSE, sample_interval = 50L, verbose = TRUE) {
-    .Call(`_HiSpaR_hispa_analyze_cpp`, input_file, output_dir, mcmc_iterations, num_clusters, mcmc_burn_in, mcmc_initial_sd, mcmc_sd_floor, mcmc_sd_ceil, use_cluster_init, cluster_init_iterations, cluster_initial_sd, save_samples, sample_interval, verbose)
+.hispa_analyze_cpp <- function(contact_matrix, output_dir, mcmc_iterations = 6000L, num_clusters = 0L, mcmc_burn_in = 0L, mcmc_initial_sd = 0.1, mcmc_sd_floor = 0.0001, mcmc_sd_ceil = 0.3, use_cluster_init = TRUE, cluster_init_iterations = 1000L, cluster_initial_sd = 0.1, save_samples = FALSE, sample_interval = 50L, verbose = TRUE) {
+    .Call(`_HiSpaR_hispa_analyze_cpp`, contact_matrix, output_dir, mcmc_iterations, num_clusters, mcmc_burn_in, mcmc_initial_sd, mcmc_sd_floor, mcmc_sd_ceil, use_cluster_init, cluster_init_iterations, cluster_initial_sd, save_samples, sample_interval, verbose)
 }
 

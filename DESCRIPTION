@@ -18,7 +18,9 @@ Depends: R (>= 4.5.0)
 Imports: 
     Rcpp (>= 1.0.0),
     utils,
-    BiocGenerics
+    stats,
+    Matrix,
+    HiCExperiment
 biocViews: Software, Epigenetics, HiC, StructuralPrediction, Bayesian, Spatial
 LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: 
@@ -30,10 +32,15 @@ URL: https://github.com/masterStormtrooper/HiSpa
 BugReports: https://github.com/masterStormtrooper/HiSpa/issues
 Encoding: UTF-8
 LazyData: false
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    rgl
+    rgl,
+    HiContactsData,
+    HiContacts,
+    Matrix,
+    plotly,
+    callr
 VignetteBuilder: knitr

@@ -1,32 +1,28 @@
 context("HiSpaR basic functionality tests")
 
 test_that("hispa_analyze handles invalid inputs", {
-  # Test with non-existent file
-  expect_error(hispa_analyze("nonexistent.txt", "output"))
+  # Test with non-numeric input
+  expect_error(hispa_analyze("invalid", "output"))
 })
 
-test_that("hispa_analyze runs successfully", {
+test_that("hispa_analyze runs successfully with matrix input", {
   skip_if_not_installed("HiSpaR")
   skip_on_cran()
   
-  # Create small test matrix and save to file
-  n <- 20
+  # Create small test matrix
+  n <- 10
   mat <- matrix(rpois(n*n, 10), n, n)
   mat <- (mat + t(mat)) / 2
-  
-  # Save to temporary file
-  input_file <- file.path(tempdir(), "test_matrix.txt")
-  write.table(mat, input_file, row.names = FALSE, col.names = FALSE)
   
   output_dir <- file.path(tempdir(), "hispa_test_output")
   dir.create(output_dir, showWarnings = FALSE)
   
-  # Run analysis - returns output directory path
+  # Run analysis with matrix input
   result <- hispa_analyze(
-    input_file = input_file,
+    hic_experiment = mat,
     output_dir = output_dir,
-    mcmc_iterations = 100,
-    mcmc_burn_in = 10,
+    mcmc_iterations = 50,
+    mcmc_burn_in = 5,
     verbose = FALSE
   )
   
@@ -34,14 +30,21 @@ test_that("hispa_analyze runs successfully", {
   expect_true(file.exists(file.path(output_dir, "final_positions.txt")))
   expect_true(file.exists(file.path(output_dir, "log_likelihood_trace.txt")))
   
-  # Clean up
-  unlink(input_file)
-  unlink(output_dir, recursive = TRUE)
+  # Check result is a list with expected elements
+  expect_type(result, "list")
+  expect_true("positions" %in% names(result))
+  expect_true("beta0" %in% names(result))
+  expect_true("beta1" %in% names(result))
   
   # Check dimensions
-  expect_equal(nrow(result$position_matrix), n)
-  expect_equal(ncol(result$position_matrix), 3)
+  expect_equal(nrow(result$positions), n)
+  expect_equal(ncol(result$positions), 3)
   
-  # Check class
-  expect_s3_class(result, "hispa_result")
+  # Check types
+  expect_true(is.matrix(result$positions))
+  expect_true(is.numeric(result$beta0))
+  expect_true(is.numeric(result$beta1))
+  
+  # Clean up
+  unlink(output_dir, recursive = TRUE)
 })

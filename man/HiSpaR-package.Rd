@@ -32,12 +32,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Your Name \email{your.email@example.com}
-
-Other contributors:
-\itemize{
-  \item Contributors Names [contributor]
-}
+\strong{Maintainer}: Yingcheng Luo \email{lyc22@mails.tsinghua.edu.cn}
 
 }
 \keyword{internal}

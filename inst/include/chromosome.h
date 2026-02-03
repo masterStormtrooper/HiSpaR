@@ -3,7 +3,8 @@
 // =========================================================================
 #ifndef CHROMOSOME_H
 #define CHROMOSOME_H
-
+#include <RcppArmadillo.h> 
+// [[Rcpp::depends(RcppArmadillo)]]
 #include <iostream>
 #include <string>
 #include <vector>
@@ -13,10 +14,10 @@
 #include <filesystem> // For directory creation
 #include <sstream> // For string streams
 #include <iomanip> // For time formatting
-#include <armadillo> // Include the Armadillo library header
+// #include <armadillo> // Include the Armadillo library header
 #include <omp.h> // For OpenMP
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/basic_file_sink.h"
+// #include "spdlog/spdlog.h"
+// #include "spdlog/sinks/basic_file_sink.h"
 
 // Platform-specific includes for memory usage
 #if defined(__APPLE__) && defined(__MACH__)
@@ -232,6 +233,8 @@ private:
     arma::mat convoluted_contact_matrix;
     double beta0;
     double beta1;
+    double best_beta0;
+    double best_beta1;
     
     // Prior distributions for different genomic distances between loci
     DistancePriors distance_priors;
@@ -306,26 +309,6 @@ private:
             return -arma::datum::inf;
         }
         double total_log_likelihood = 0.0;
-        
-        // const double* dist_mem = distances.memptr();
-        // const double* cont_mem = contacts.memptr();
-        // const arma::uword n_elem = distances.n_elem;
-
-        // for (arma::uword i = 0; i < n_elem; ++i) {
-        //     const double d = dist_mem[i];
-            
-        //     if (d <= 0) {
-        //         continue;
-        //     }
-
-        //     const double c = cont_mem[i];
-        //     const double log_lam = b0 + b1 * std::log(d);
-        //     const double term = c * log_lam - std::exp(log_lam);
-            
-        //     if (std::isfinite(term)) {
-        //         total_log_likelihood += term;
-        //     }
-        // }
 
         for (arma::uword i = 0; i < distances.n_elem; ++i) {
             const double d = distances(i);
@@ -399,9 +382,7 @@ public:
      * @param save_samples Whether to save samples during MCMC.
      * @param sample_interval Save every kth sample after burn-in (default: 5).
      */
-    void run_mcmc(int iterations, int burn_in, double initial_sd = 0.1, double sd_floor = 0.001, double sd_ceiling = 0.3, bool save_samples = false, int sample_interval = 5);
-    void run_mcmc_convoluted(int iterations, int burn_in, double initial_sd = 0.1, double sd_floor = 0.001, double sd_ceiling = 0.3, bool save_samples = false, int sample_interval = 5, int k = 3);
-    void run_mcmc_finetune(int iterations);
+    void run_mcmc(int iterations, int burn_in, double initial_sd = 0.1, double sd_floor = 0.001, double sd_ceiling = 0.3, bool save_samples = false, int sample_interval = 5, bool save_intermediate = false, bool verbose = false);
     // --- GETTERS ---
     const std::string& get_name() const;
     const arma::mat& get_contact_matrix() const;
@@ -413,6 +394,8 @@ public:
     const arma::mat& get_pairwise_distance_matrix() const;
     double get_beta0() const;
     double get_beta1() const;
+    double get_best_beta0() const;
+    double get_best_beta1() const;
     const arma::vec& get_mcmc_trace_beta0() const;
     const arma::vec& get_mcmc_trace_beta1() const;
     const std::vector<arma::mat>& get_mcmc_trace_cluster_centers() const;
@@ -443,6 +426,7 @@ public:
     void set_adjacent_distance_prior(double shape, double rate);  // Legacy setter
     void set_adjacent_distance_prior(const GammaPrior& prior);    // Legacy setter
     void set_position_matrix(const arma::mat& positions);
+    void set_contact_matrix(const arma::mat& contacts);
     void set_prior_contact_matrix(const arma::mat& contacts);
     bool load_prior_contact_matrix_from_file(const std::string& filename);
     void set_skip_zero_contact_loci(bool skip);
