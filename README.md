@@ -122,9 +122,7 @@ Run complete HiSpa MCMC analysis on a Hi-C contact matrix following the exact wo
 **Output Files:** All results are automatically saved to `output_dir`:
 - `final_positions.txt` - Final 3D coordinates (n × 3 matrix)
 - `initial_positions.txt` - Initial positions before MCMC
-- `log_likelihood_trace.txt` - MCMC log-likelihood values
-- `block_timings.txt` - Computation time per MCMC block
-- `mcmc_log.txt` - Detailed analysis log
+
 
 **Workflow:**
 1. Load contact matrix from input file / matrix
@@ -144,8 +142,8 @@ library(HiSpaR)
 data(su1_contact_mat)
 
 # Run analysis - results saved automatically
-hispa_analyze(
-  input_file = "su1_contact_mat",
+results <- hispa_analyze(
+  su1_contact_mat,
   output_dir = "su1",
   mcmc_iterations = 4000,
   mcmc_burn_in = 1000,
@@ -153,7 +151,7 @@ hispa_analyze(
 )
 
 # Read results from output directory
-final_pos <- as.matrix(read.table("su1/final_positions.txt"))
+final_pos <- results$positions
 
 # 3D visualization (requires plotly)
 library(plotly)
