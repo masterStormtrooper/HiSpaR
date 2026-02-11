@@ -176,11 +176,13 @@ hispa_analyze <- function(
     
     if (n_removed > 0) {
       if (verbose) {
-        cat("Filtering loci by contact count:\n")
-        cat("  Original number of loci: ", n_before, "\n")
-        cat("  Threshold (", filter_quantile, " quantile): ", threshold, "\n")
-        cat("  Loci removed: ", n_removed, "\n")
-        cat("  Final number of loci: ", n_after, "\n")
+        message(
+          "Filtering loci by contact count:\n",
+          "  Original number of loci: ", n_before, "\n",
+          "  Threshold (", filter_quantile, " quantile): ", threshold, "\n",
+          "  Loci removed: ", n_removed, "\n",
+          "  Final number of loci: ", n_after
+        )
       }
       
       # Filter the contact matrix
@@ -190,14 +192,14 @@ hispa_analyze <- function(
       original_indices <- which(keep_idx)
     } else {
       if (verbose) {
-        cat("No loci filtered (all loci above threshold)\n")
+        message("No loci filtered (all loci above threshold)")
       }
       original_indices <- seq_len(nrow(contact_matrix))
     }
   } else {
     # No filtering
     if (verbose) {
-      cat("No locus filtering applied (filter_quantile = ", filter_quantile, ")\n")
+      message("No locus filtering applied (filter_quantile = ", filter_quantile, ")")
     }
     original_indices <- seq_len(nrow(contact_matrix))
   }

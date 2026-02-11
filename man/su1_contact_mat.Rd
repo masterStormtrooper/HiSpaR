@@ -17,25 +17,23 @@ A symmetric numeric matrix with 649 rows and 649 columns, where
   }
 }
 \source{
-Drosophila melanogaster Hi-C data, chromosome SU1
+Human Hi-C data, chromosome 21, collected from https://zenodo.org/records/3928890
 }
 \usage{
 su1_contact_mat
 }
 \description{
-Hi-C contact matrix from Drosophila melanogaster chromosome SU1
-containing normalized contact frequencies between genomic loci.
+Hi-C contact matrix of Human Chromosome 21, collected from https://zenodo.org/records/3928890.
 This dataset is provided as an example for testing and demonstrating
 the HiSpaR package functionality.
 }
 \details{
 This contact matrix represents chromatin interaction frequencies derived
-from Hi-C experiments on Drosophila melanogaster chromosome SU1. Higher
+from Hi-C experiments on Human Chromosome 21. Higher
 values indicate more frequent spatial proximity between genomic loci in
 the 3D nuclear space.
 
-The data can be used directly with \code{\link{hispa_analyze}} by first
-saving it to a text file.
+The data can be used directly with \code{\link{hispa_analyze}}
 }
 \examples{
 # Load the example data
