@@ -106,6 +106,12 @@ HiSpaR provides the main function `hispa_analyze()` to perform the complete 3D s
 - `filter_quantile`: Remove loci below this quantile of contact counts (default: -1, no filtering). Use 0.1 to remove bottom 10%
 - `mcmc_burn_in`: Number of burn-in iterations to discard (default: 0)
 
+When run with `verbose = TRUE` (the default), `hispa_analyze()` prints a filtering report,
+phase completion checkpoints (`[Pre-processing] Completed`, `[Structure Initialization] Completed`,
+`[Global Assembly] Completed` when using cluster initialization), MCMC settings and progress,
+per-parameter acceptance rates, and a summary of files written to `output_dir`. It returns a
+named list with `$positions` (n×3 matrix of inferred 3D coordinates), `$beta0`, and `$beta1`.
+
 ```{r example, eval=TRUE}
 # Run analysis on the example HiCExperiment object
 result_yeast <- hispa_analyze(
@@ -149,12 +155,13 @@ cat("Estimated parameters: beta0 =", result_su$beta0, ", beta1 =", result_su$bet
 
 - *Filtering report*: original locus count, quantile threshold, number removed, final count
   (e.g. 649 → 584 after removing 65 loci in the bottom 10%).
-- *MCMC progress*: dimensions confirmed, pre-processing steps (clustering, backbone),
-  initialization, and per-iteration log-likelihood trace
-  (e.g. `Iter 1000/1000. LL: 166134. Best LL: 166134`).
+- *MCMC progress*: phase checkpoints (`[Pre-processing] Completed`, `[Structure Initialization] Completed`,
+  `[Global Assembly] Completed`), followed by MCMC settings (iterations, burn-in, SD bounds) and
+  a final summary (`Final max log-likelihood found: ...`).
 - *Acceptance rates* for β0, β1, center positions, and locus positions should ideally be 20–30% and generally remain below 50%; excessively high acceptance rates can indicate weak information in the data.
-- *Summary of files* saved to `output_dir`: `final_positions.txt`, `initial_positions.txt`,
-  `log_likelihood_trace.txt`, `block_timings.txt`, `mcmc_log.txt`.
+- *Summary of files* saved to `output_dir`: always `final_positions.txt`, `final_parameters.txt`,
+  `initial_positions.txt`, `initial_distances.txt`; additionally `post_scale_positions.txt` and
+  `initialization/` (per-cluster and backbone sub-runs) when `use_cluster_init = TRUE`.
 
 **Return value** — a list of 3 elements:
 
