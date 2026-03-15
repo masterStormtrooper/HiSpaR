@@ -99,17 +99,14 @@ Both formats are automatically handled by `hispa_analyze()`, which extracts and 
 
 HiSpaR provides the main function `hispa_analyze()` to perform the complete 3D structure inference pipeline.
 
-### Key Parameters
-
-- `mcmc_iterations`: Total number of MCMC iterations (default: 6000)
-- `use_cluster_init`: Use hierarchical clustering for initialization (recommended for large datasets)
-- `filter_quantile`: Remove loci below this quantile of contact counts (default: -1, no filtering). Use 0.1 to remove bottom 10%
-- `mcmc_burn_in`: Number of burn-in iterations to discard (default: 0)
-
-When run with `verbose = TRUE` (the default), `hispa_analyze()` prints a filtering report,
-phase completion checkpoints, MCMC settings and progress(every 1000 iterations),
-per-parameter acceptance rates, and a summary of files written to `output_dir`. It returns a
-named list with `$positions` (n×3 matrix of inferred 3D coordinates), `$beta0`, and `$beta1`.
+The key parameters are: `mcmc_iterations` (total MCMC iterations, default 6000),
+`use_cluster_init` (use hierarchical clustering for initialization, recommended for large datasets),
+`filter_quantile` (remove loci below this quantile of contact counts, default -1 meaning no
+filtering; use 0.1 to remove the bottom 10%), and `mcmc_burn_in` (iterations to discard as
+burn-in, default 0). When run with `verbose = TRUE` (the default), `hispa_analyze()` prints a
+filtering report, phase completion checkpoints, MCMC settings and progress, per-parameter
+acceptance rates, and a summary of files written to `output_dir`. It returns a named list with
+`$positions` (n×3 matrix of inferred 3D coordinates), `$beta0`, and `$beta1`.
 
 ```{r example, eval=TRUE}
 # Run analysis on the example HiCExperiment object
