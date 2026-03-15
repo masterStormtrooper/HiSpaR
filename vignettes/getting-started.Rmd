@@ -72,7 +72,7 @@ data(su1_contact_mat)
 cat("Loaded contact matrix dimensions:", dim(su1_contact_mat), "\n")
 ```
 
-**`su1_contact_mat`** is a 649×649 numeric contact matrix representing human chromosome 21,
+**`su1_contact_mat`** is a 649×649 numeric contact matrix for the 10.4–46.7 Mb region of human chromosome 21 at 50 kb resolution,
 derived from Su et al. (2020) (zenodo.org/records/3928890). Each entry (i, j) contains the
 number of Hi-C contacts between locus i and locus j. This is HiSpaR's built-in example dataset.
 
