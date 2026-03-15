@@ -152,7 +152,7 @@ cat("Estimated parameters: beta0 =", result_su$beta0, ", beta1 =", result_su$bet
 - *MCMC progress*: dimensions confirmed, pre-processing steps (clustering, backbone),
   initialization, and per-iteration log-likelihood trace
   (e.g. `Iter 1000/1000. LL: 166134. Best LL: 166134`).
-- *Acceptance rates* for β0, β1, center positions, and locus positions (~22–25% is healthy).
+- *Acceptance rates* for β0, β1, center positions, and locus positions should ideally be 20–30% and generally remain below 50%; excessively high acceptance rates can indicate weak information in the data.
 - *Summary of files* saved to `output_dir`: `final_positions.txt`, `initial_positions.txt`,
   `log_likelihood_trace.txt`, `block_timings.txt`, `mcmc_log.txt`.
 
