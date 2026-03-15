@@ -170,6 +170,94 @@ test_that("hispa_analyze safe_mode = FALSE runs inline", {
   unlink(output_dir, recursive = TRUE)
 })
 
+test_that("hispa_analyze accepts HiCExperiment input", {
+  skip_if_not_installed("HiSpaR")
+  skip_if_not_installed("HiContacts")
+  skip_if_not_installed("HiContactsData")
+  skip_on_cran()
+
+  cool_file <- HiCExperiment::CoolFile(HiContactsData::HiContactsData("yeast_wt", format = "cool"))
+  hic <- HiCExperiment::import(cool_file, focus = "II:10000-100000")
+
+  output_dir <- file.path(tempdir(), "hispa_test_hic")
+  dir.create(output_dir, showWarnings = FALSE)
+
+  result <- hispa_analyze(
+    hic_experiment = hic,
+    output_dir = output_dir,
+    mcmc_iterations = 50,
+    mcmc_burn_in = 5,
+    filter_quantile = 0.1,
+    verbose = FALSE,
+    safe_mode = FALSE
+  )
+
+  expect_type(result, "list")
+  expect_true("positions" %in% names(result))
+  expect_equal(ncol(result$positions), 3)
+  expect_true(is.numeric(result$beta0))
+  expect_true(is.numeric(result$beta1))
+
+  unlink(output_dir, recursive = TRUE)
+})
+
+test_that("hispa_analyze safe_mode = TRUE runs in subprocess", {
+  skip_if_not_installed("HiSpaR")
+  skip_if_not_installed("callr")
+  skip_on_cran()
+
+  n <- 8
+  mat <- matrix(rpois(n * n, 10), n, n)
+  mat <- (mat + t(mat)) / 2
+  storage.mode(mat) <- "double"
+
+  output_dir <- file.path(tempdir(), "hispa_test_safe")
+  dir.create(output_dir, showWarnings = FALSE)
+
+  result <- hispa_analyze(
+    hic_experiment = mat,
+    output_dir = output_dir,
+    mcmc_iterations = 50,
+    mcmc_burn_in = 5,
+    verbose = FALSE,
+    safe_mode = TRUE
+  )
+
+  expect_type(result, "list")
+  expect_true("positions" %in% names(result))
+  expect_equal(nrow(result$positions), n)
+  expect_equal(ncol(result$positions), 3)
+
+  unlink(output_dir, recursive = TRUE)
+})
+
+test_that("hispa_analyze creates output_dir if it does not exist", {
+  skip_if_not_installed("HiSpaR")
+  skip_on_cran()
+
+  n <- 8
+  mat <- matrix(rpois(n * n, 10), n, n)
+  mat <- (mat + t(mat)) / 2
+  storage.mode(mat) <- "double"
+
+  output_dir <- file.path(tempdir(), "hispa_test_autocreate", "subdir")
+  # ensure it does not exist
+  unlink(output_dir, recursive = TRUE)
+  expect_false(dir.exists(output_dir))
+
+  hispa_analyze(
+    hic_experiment = mat,
+    output_dir = output_dir,
+    mcmc_iterations = 50,
+    mcmc_burn_in = 5,
+    verbose = FALSE,
+    safe_mode = FALSE
+  )
+
+  expect_true(dir.exists(output_dir))
+  unlink(file.path(tempdir(), "hispa_test_autocreate"), recursive = TRUE)
+})
+
 test_that("hispa_analyze verbose = FALSE suppresses messages", {
   skip_if_not_installed("HiSpaR")
   skip_on_cran()
