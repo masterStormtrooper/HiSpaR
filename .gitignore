@@ -19,3 +19,7 @@ src/Makevars
 *.BiocCheck/
 vignettes/*.html
 vignettes/*.pdf
+
+# Claude Code
+CLAUDE.md
+.claude/
