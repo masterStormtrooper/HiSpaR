@@ -107,8 +107,7 @@ HiSpaR provides the main function `hispa_analyze()` to perform the complete 3D s
 - `mcmc_burn_in`: Number of burn-in iterations to discard (default: 0)
 
 When run with `verbose = TRUE` (the default), `hispa_analyze()` prints a filtering report,
-phase completion checkpoints (`[Pre-processing] Completed`, `[Structure Initialization] Completed`,
-`[Global Assembly] Completed` when using cluster initialization), MCMC settings and progress,
+phase completion checkpoints, MCMC settings and progress(every 1000 iterations),
 per-parameter acceptance rates, and a summary of files written to `output_dir`. It returns a
 named list with `$positions` (n×3 matrix of inferred 3D coordinates), `$beta0`, and `$beta1`.
 
