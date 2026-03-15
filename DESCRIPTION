@@ -1,7 +1,7 @@
 Package: HiSpaR
 Type: Package
 Title: Hierarchical Inference of Spatial Positions from Hi-C Data
-Version: 0.99.2
+Version: 0.99.3
 Date: 2026-01-15
 Authors@R: c(
     person("Yingcheng", "Luo", email = "lyc22@mails.tsinghua.edu.cn", role = c("aut", "cre"))
