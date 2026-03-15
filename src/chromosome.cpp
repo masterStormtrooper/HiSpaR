@@ -632,7 +632,7 @@ void Chromosome::scale_structure() {
         final_cluster_pos.each_row() += backbone_structure.row(c);
         position_matrix.rows(cluster_indices) = final_cluster_pos;
     }
-    position_matrix.save(chromosome_name + "/post_scale_positions.txt", arma::raw_ascii);
+    // position_matrix.save(chromosome_name + "/post_scale_positions.txt", arma::raw_ascii);
 }
 
 

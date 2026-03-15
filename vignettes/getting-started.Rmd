@@ -159,8 +159,8 @@ cat("Estimated parameters: beta0 =", result_su$beta0, ", beta1 =", result_su$bet
   a final summary (`Final max log-likelihood found: ...`).
 - *Acceptance rates* for β0, β1, center positions, and locus positions should ideally be 20–30% and generally remain below 50%; excessively high acceptance rates can indicate weak information in the data.
 - *Summary of files* saved to `output_dir`: always `final_positions.txt`, `final_parameters.txt`,
-  `initial_positions.txt`, `initial_distances.txt`; additionally `post_scale_positions.txt` and
-  `initialization/` (per-cluster and backbone sub-runs) when `use_cluster_init = TRUE`.
+  `initial_positions.txt`, `initial_distances.txt`; additionally `initialization/`
+  (per-cluster and backbone sub-runs) when `use_cluster_init = TRUE`.
 
 **Return value** — a list of 3 elements:
 

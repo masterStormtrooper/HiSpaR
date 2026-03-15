@@ -126,7 +126,6 @@ Rcpp::List hispa_analyze_cpp(
             Rcpp::Rcout << "  - initial_positions.txt\n";
             Rcpp::Rcout << "  - initial_distances.txt\n";
             if (use_cluster_init) {
-                Rcpp::Rcout << "  - post_scale_positions.txt\n";
                 Rcpp::Rcout << "  - initialization/ (per-cluster and backbone sub-runs)\n";
             }
             if (save_samples) {
