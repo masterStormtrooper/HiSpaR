@@ -56,55 +56,38 @@ Rcpp::List hispa_analyze_cpp(
         my_chromosome.set_sample_from_prior(false);
         
         // --- 1. Pre-processing: Assign clusters ---
-        if (verbose) {
-            Rcpp::Rcout << "\n=== Pre-processing ===\n";
-            Rcpp::Rcout << "Assigning clusters...\n";
-        }
-        
         if (num_clusters > 0) {
             my_chromosome.assign_clusters(num_clusters);
         } else {
             if (contact_matrix.n_rows < 25) {
-                Rcpp::Rcout << "Contact matrix has fewer than 25 loci; defaulting to 1 cluster.\n";
                 my_chromosome.assign_clusters(1);
-            }
-            
-            else{
+            } else {
                 my_chromosome.assign_clusters();  // Auto-detect sqrt(n)
             }
-            
-        }
-        
-        // Build cluster relationships (using default distance threshold = 2)
-        if (verbose) {
-            Rcpp::Rcout << "Building cluster relationships...\n";
         }
         my_chromosome.build_cluster_relationships_by_distance(2);
-        
-        // --- 2. Initialize structure ---
         if (verbose) {
-            Rcpp::Rcout << "\n=== Structure Initialization ===\n";
+            Rcpp::Rcout << "[Pre-processing] Completed\n";
         }
-        
+
+        // --- 2. Initialize structure ---
         if (use_cluster_init) {
-            if (verbose) {
-                Rcpp::Rcout << "Initializing structure from individual cluster MCMC...\n";
-                Rcpp::Rcout << "Cluster MCMC iterations: " << cluster_init_iterations << "\n";
-                Rcpp::Rcout << "Cluster initial SD: " << cluster_initial_sd << "\n";
-            }
             my_chromosome.initialize_structure_from_clusters(
                 cluster_init_iterations, 0, cluster_initial_sd);
-            
+            if (verbose) {
+                Rcpp::Rcout << "[Structure Initialization] Completed\n";
+            }
+
             // --- 3. Assemble global structure ---
-            if (verbose) {
-                Rcpp::Rcout << "Assembling global structure...\n";
-            }
             my_chromosome.assemble_global_structure();
-        } else {
             if (verbose) {
-                Rcpp::Rcout << "Using random position initialization...\n";
+                Rcpp::Rcout << "[Global Assembly] Completed\n";
             }
+        } else {
             my_chromosome.initialize_positions();
+            if (verbose) {
+                Rcpp::Rcout << "[Structure Initialization] Completed\n";
+            }
         }
         
         

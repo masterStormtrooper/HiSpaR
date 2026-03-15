@@ -500,7 +500,7 @@ void Chromosome::initialize_structure_from_clusters(int sub_iterations, int sub_
             }
         }
     }
-    std::cout << "--- Finished Initializing All Cluster and Backbone Structures ---" << std::endl;
+    // std::cout << "--- Finished Initializing All Cluster and Backbone Structures ---" << std::endl;
     auto init_end_time = std::chrono::steady_clock::now();
     std::chrono::duration<double> init_duration = init_end_time - init_start_time;
     // logger->info("Initialization completed in {:.2f} seconds.", init_duration.count());
@@ -642,7 +642,7 @@ void Chromosome::assemble_global_structure() {
         return;
     }
 
-    Rcpp::Rcout << "\n--- Assembling Global Structure ---" << std::endl;
+    // Rcpp::Rcout << "\n--- Assembling Global Structure ---" << std::endl;
     auto assembly_start_time = std::chrono::steady_clock::now();
     scale_structure();
     // arma::uword n_loci = contact_matrix.n_rows;
@@ -703,7 +703,7 @@ void Chromosome::assemble_global_structure() {
         // Rcpp::Rcout << "Post-alignment distance between clusters " << (c - 1) << " and " << c << ": " << new_current_dist << std::endl;
     }
 
-    Rcpp::Rcout << "--- Global Assembly Complete ---" << std::endl;  
+    // Rcpp::Rcout << "--- Global Assembly Complete ---" << std::endl;
      
     auto assembly_end_time = std::chrono::steady_clock::now();
     std::chrono::duration<double> assembly_duration = assembly_end_time - assembly_start_time;
@@ -744,8 +744,8 @@ void Chromosome::assemble_global_structure() {
     best_position_matrix = position_matrix;
     position_matrix.save(chromosome_name + "/initial_positions.txt", arma::raw_ascii);
     pairwise_distance_matrix.save(chromosome_name + "/initial_distances.txt", arma::raw_ascii);
-    Rcpp::Rcout << "Initial log-likelihood: " << max_log_likelihood << std::endl;
-    Rcpp::Rcout << "Position matrix has shape: " << position_matrix.n_rows << " x " << position_matrix.n_cols << std::endl;
+    // Rcpp::Rcout << "Initial log-likelihood: " << max_log_likelihood << std::endl;
+    // Rcpp::Rcout << "Position matrix has shape: " << position_matrix.n_rows << " x " << position_matrix.n_cols << std::endl;
     // Rcpp::Rcout << "DEBUG: End of assemble_global_structure(), this=" << this 
     //           << ", position_matrix.is_empty()=" << position_matrix.is_empty() 
     //           << ", position_matrix.memptr()=" << (void*)position_matrix.memptr() << std::endl;
@@ -1416,13 +1416,13 @@ bool Chromosome::load_prior_contact_matrix_from_file(const std::string& filename
 void Chromosome::set_skip_zero_contact_loci(bool skip) {
     skip_zero_contact_loci = skip;
     // logger->info("Set skip_zero_contact_loci to: {}", skip);
-    Rcpp::Rcout << "Skip zero-contact loci: " << (skip ? "enabled" : "disabled") << std::endl;
+    // Rcpp::Rcout << "Skip zero-contact loci: " << (skip ? "enabled" : "disabled") << std::endl;
 }
 
 void Chromosome::set_sample_from_prior(bool sample) {
     sample_from_prior = sample;
     // logger->info("Set sample_from_prior to: {}", sample);
-    Rcpp::Rcout << "Sample from prior positions: " << (sample ? "enabled" : "disabled") << std::endl;
+    // Rcpp::Rcout << "Sample from prior positions: " << (sample ? "enabled" : "disabled") << std::endl;
 }
 
 bool Chromosome::get_sample_from_prior() const {
