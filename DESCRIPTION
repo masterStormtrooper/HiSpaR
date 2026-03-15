@@ -28,8 +28,8 @@ SystemRequirements:
     GNU make,
     Armadillo (>= 9.0),
     OpenMP
-URL: https://github.com/masterStormtrooper/HiSpa
-BugReports: https://github.com/masterStormtrooper/HiSpa/issues
+URL: https://github.com/masterStormtrooper/HiSpaR
+BugReports: https://github.com/masterStormtrooper/HiSpaR/issues
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.3.3

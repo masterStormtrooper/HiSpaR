@@ -53,32 +53,12 @@ brew install libomp
 install.packages(c("Rcpp", "RcppArmadillo", "devtools"))
 ```
 
-### Building and Installing
-
-#### Option 1: Install from Source (Recommended)
+### Installing from Bioconductor
 
 ```r
-# Install devtools if not already installed
-if (!require("devtools")) install.packages("devtools")
-
-# Navigate to the package directory
-setwd("/path/to/HiSpa/R-package")
-
-# Install the package
-devtools::install()
-```
-
-#### Option 2: Using R CMD
-
-```bash
-# In terminal, from HiSpa/R-package directory
-cd /path/to/HiSpa/R-package
-
-# Build the package
-R CMD build .
-
-# Install the package
-R CMD INSTALL HiSpaR_0.99.0.tar.gz
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("HiSpaR")
 ```
 
 ### Platform-Specific Notes
@@ -206,7 +186,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Contact
 
-- **Issues**: https://github.com/masterStormtrooper/HiSpa/issues
+- **Issues**: https://github.com/masterStormtrooper/HiSpaR/issues
 - **Email**: lyc22@mails.tsinghua.edu.cn
 
 ## Acknowledgments

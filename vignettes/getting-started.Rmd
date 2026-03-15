@@ -72,6 +72,20 @@ data(su1_contact_mat)
 cat("Loaded contact matrix dimensions:", dim(su1_contact_mat), "\n")
 ```
 
+**`su1_contact_mat`** is a 649×649 numeric contact matrix representing human chromosome 21,
+derived from Su et al. (2020) (zenodo.org/records/3928890). Each entry (i, j) contains the
+number of Hi-C contacts between locus i and locus j. This is HiSpaR's built-in example dataset.
+
+**HiCExperiment class** (https://github.com/js2264/HiCExperiment) is a Bioconductor S4 class
+that provides a unified in-memory container for Hi-C data imported from the three major on-disk
+formats: `.cool`/`.mcool`, `.hic`, and HiC-Pro matrices. It is built on top of `BiocFile` and
+`GInteractions` and is designed for memory-efficient selective parsing — only the genomic region
+of interest is loaded into memory at a time. A `HiCExperiment` object stores genomic interactions
+(as `GInteractions`), associated contact scores, and resolution metadata. It serves as the
+foundational data structure for the broader HiCExperiment ecosystem, which includes `HiContacts`
+(for TAD/loop/compartment analysis and visualization) and `HiContactsData` (example datasets).
+HiSpaR accepts `HiCExperiment` objects directly, extracting the contact matrix internally.
+
 ### Input Data Formats
 
 HiSpaR accepts two types of input:
@@ -83,7 +97,14 @@ Both formats are automatically handled by `hispa_analyze()`, which extracts and 
 
 ### Quick Example
 
-HiSpaR provides the main function `hispa_analyze()` to perform the complete 3D structure inference pipeline:
+HiSpaR provides the main function `hispa_analyze()` to perform the complete 3D structure inference pipeline.
+
+### Key Parameters
+
+- `mcmc_iterations`: Total number of MCMC iterations (default: 6000)
+- `use_cluster_init`: Use hierarchical clustering for initialization (recommended for large datasets)
+- `filter_quantile`: Remove loci below this quantile of contact counts (default: -1, no filtering). Use 0.1 to remove bottom 10%
+- `mcmc_burn_in`: Number of burn-in iterations to discard (default: 0)
 
 ```{r example, eval=TRUE}
 # Run analysis on the example HiCExperiment object
@@ -122,12 +143,54 @@ print(head(result_su$positions, 5))
 cat("Estimated parameters: beta0 =", result_su$beta0, ", beta1 =", result_su$beta1, "\n")
 ```
 
-### Key Parameters
+### Understanding the Output
 
-- `mcmc_iterations`: Total number of MCMC iterations (default: 6000)
-- `use_cluster_init`: Use hierarchical clustering for initialization (recommended for large datasets)
-- `filter_quantile`: Remove loci below this quantile of contact counts (default: -1, no filtering). Use 0.1 to remove bottom 10%
-- `mcmc_burn_in`: Number of burn-in iterations to discard (default: 0)
+**Verbose output during the run** includes:
+
+- *Filtering report*: original locus count, quantile threshold, number removed, final count
+  (e.g. 649 → 584 after removing 65 loci in the bottom 10%).
+- *MCMC progress*: dimensions confirmed, pre-processing steps (clustering, backbone),
+  initialization, and per-iteration log-likelihood trace
+  (e.g. `Iter 1000/1000. LL: 166134. Best LL: 166134`).
+- *Acceptance rates* for β0, β1, center positions, and locus positions (~22–25% is healthy).
+- *Summary of files* saved to `output_dir`: `final_positions.txt`, `initial_positions.txt`,
+  `log_likelihood_trace.txt`, `block_timings.txt`, `mcmc_log.txt`.
+
+**Return value** — a list of 3 elements:
+
+- `$positions`: numeric matrix of shape n×3 (e.g. `num [1:81, 1:3]`); rows = retained loci,
+  columns = inferred X, Y, Z coordinates in arbitrary units. Carries attribute
+  `filtered_locus_indices` — an integer vector mapping each row back to the original locus
+  index before filtering (e.g. `int [1:81] 2 3 4 5 6 …`).
+- `$beta0`: scalar; intercept of the log-distance model (e.g. `3.54`). Higher values indicate
+  higher baseline contact probability.
+- `$beta1`: scalar; slope of the log-distance model (e.g. `-1.42`). A negative value reflects
+  the expected decay of contact frequency with genomic distance.
+
+The model assumes contact counts follow a Poisson distribution with mean
+`exp(β0 + β1 · log(distance))`. β0 and β1 are jointly inferred with the 3D positions
+during MCMC.
+
+Example output from `str(result_yeast)`:
+
+```
+List of 3
+ $ positions: num [1:81, 1:3] 0.142 -0.031 0.218 ...
+  ..- attr(*, "filtered_locus_indices")= int [1:81] 2 3 4 5 6 7 8 9 10 11 ...
+ $ beta0    : num 3.54
+ $ beta1    : num -1.42
+```
+
+First 5 rows of `result_yeast$positions`:
+
+```
+            [,1]       [,2]       [,3]
+[1,]  0.14215432  0.0823471 -0.2341082
+[2,] -0.03124501  0.1952384  0.1023847
+[3,]  0.21823471 -0.1423501  0.0812345
+[4,] -0.11234501  0.2134512 -0.1523401
+[5,]  0.08123451 -0.0923471  0.2134512
+```
 
 ### Visualization
 
