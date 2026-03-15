@@ -122,10 +122,16 @@ Rcpp::List hispa_analyze_cpp(
             Rcpp::Rcout << "\n=== Analysis Complete ===\n";
             Rcpp::Rcout << "All results saved: \n";
             Rcpp::Rcout << "  - final_positions.txt\n";
+            Rcpp::Rcout << "  - final_parameters.txt\n";
             Rcpp::Rcout << "  - initial_positions.txt\n";
-            Rcpp::Rcout << "  - log_likelihood_trace.txt\n";
-            Rcpp::Rcout << "  - block_timings.txt\n";
-            Rcpp::Rcout << "  - mcmc_log.txt\n";
+            Rcpp::Rcout << "  - initial_distances.txt\n";
+            if (use_cluster_init) {
+                Rcpp::Rcout << "  - post_scale_positions.txt\n";
+                Rcpp::Rcout << "  - initialization/ (per-cluster and backbone sub-runs)\n";
+            }
+            if (save_samples) {
+                Rcpp::Rcout << "  - samples/mcmc_samples_*.txt\n";
+            }
         }
         
         // Extract final results and create output list
