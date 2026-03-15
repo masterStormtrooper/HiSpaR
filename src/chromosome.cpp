@@ -1371,7 +1371,7 @@ void Chromosome::set_contact_matrix(const arma::mat& contacts) {
     // Make an explicit deep copy from the reference
     contact_matrix = contacts;
     
-    Rcpp::Rcout << "Contact matrix set successfully: " << contact_matrix.n_rows << " x " << contact_matrix.n_cols << std::endl;
+    // Rcpp::Rcout << "Contact matrix set successfully: " << contact_matrix.n_rows << " x " << contact_matrix.n_cols << std::endl;
     // logger->info("Set contact matrix ({} x {})", contacts.n_rows, contacts.n_cols);
 }
 
