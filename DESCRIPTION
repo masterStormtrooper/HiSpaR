@@ -1,7 +1,7 @@
 Package: HiSpaR
 Type: Package
 Title: Hierarchical Inference of Spatial Positions from Hi-C Data
-Version: 0.99.5
+Version: 0.99.6
 Date: 2026-01-15
 Authors@R: c(
     person("Yingcheng", "Luo", email = "lyc22@mails.tsinghua.edu.cn", role = c("aut", "cre"))
@@ -33,14 +33,14 @@ BugReports: https://github.com/masterStormtrooper/HiSpaR/issues
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.3.3
-Suggests: 
+Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
+    BiocStyle,
     rgl,
     HiContactsData,
     HiContacts,
-    Matrix,
     plotly,
     callr
 VignetteBuilder: knitr

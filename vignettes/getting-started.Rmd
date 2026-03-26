@@ -10,7 +10,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup-opts, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -176,7 +176,7 @@ during MCMC.
 
 Example output from `str(result_yeast)`:
 
-```
+```r
 List of 3
  $ positions: num [1:81, 1:3] 0.142 -0.031 0.218 ...
   ..- attr(*, "filtered_locus_indices")= int [1:81] 2 3 4 5 6 7 8 9 10 11 ...
@@ -186,7 +186,7 @@ List of 3
 
 First 5 rows of `result_yeast$positions`:
 
-```
+```r
             [,1]       [,2]       [,3]
 [1,]  0.14215432  0.0823471 -0.2341082
 [2,] -0.03124501  0.1952384  0.1023847

@@ -152,7 +152,7 @@ void Chromosome::assign_clusters(int num_clusters) {
     // Rcpp::Rcout << "Assigning " << n_loci << " loci into " << num_clusters << " clusters..." << std::endl;
     for (arma::uword i = 0; i < n_loci; ++i) {
         arma::uword label = i / cluster_size;
-        if (label >= num_clusters) {
+        if (label >= static_cast<arma::uword>(num_clusters)) {
             label = num_clusters - 1;
         }
         cluster_labels(i) = label;
@@ -332,11 +332,11 @@ void Chromosome::build_cluster_relationships_by_distance(int window_size) {
     calculate_backbone_contact_matrix(indices_by_cluster);
 
     cluster_adjacencies.resize(num_clusters);
-    for (int c = 0; c < num_clusters; ++c) {
+    for (int c = 0; c < static_cast<int>(num_clusters); ++c) {
         cluster_adjacencies[c].self_indices = indices_by_cluster[c];
 
         std::vector<arma::uword> temp_neighbor_indices, temp_stranger_indices;
-        for (int other_c = 0; other_c < num_clusters; ++other_c) {
+        for (int other_c = 0; other_c < static_cast<int>(num_clusters); ++other_c) {
             if (c == other_c) continue;
 
             if (std::abs(c - other_c) <= window_size) {
@@ -1267,8 +1267,7 @@ void Chromosome::log_memory_usage() {
                 std::string key;
                 long memory_kb;
                 iss >> key >> memory_kb;
-                double memory_mb = static_cast<double>(memory_kb) / 1024.0;
-                // logger->info("Peak memory usage (RSS): {:.2f} MB", memory_mb);
+                // logger->info("Peak memory usage (RSS): {:.2f} MB", static_cast<double>(memory_kb) / 1024.0);
                 break;
             }
         }
